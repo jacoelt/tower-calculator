@@ -76,8 +76,8 @@ export const bounceChanceUpgrades: Upgrade[] = formatDataString(bounceChanceStr,
 export const bounceTargetsUpgrades: Upgrade[] = formatDataString(bounceTargetsStr, WorkshopUpgradeType.BounceTargets)
 export const healthUpgrades: Upgrade[] = formatDataString(healthStr, WorkshopUpgradeType.Health)
 export const healthRegenUpgrades: Upgrade[] = formatDataString(healthRegenStr, WorkshopUpgradeType.HealthRegen)
-export const defencePercentUpgrades: Upgrade[] = formatDataString(defensePercentStr, WorkshopUpgradeType.DefensePercent)
-export const defenceFlatUpgrades: Upgrade[] = formatDataString(defenseFlatStr, WorkshopUpgradeType.DefenseFlat)
+export const defensePercentUpgrades: Upgrade[] = formatDataString(defensePercentStr, WorkshopUpgradeType.DefensePercent)
+export const defenseFlatUpgrades: Upgrade[] = formatDataString(defenseFlatStr, WorkshopUpgradeType.DefenseFlat)
 
 
 export const allWorkshopUpgrades: { [key: string]: Upgrade[] } = {
@@ -92,8 +92,8 @@ export const allWorkshopUpgrades: { [key: string]: Upgrade[] } = {
     [WorkshopUpgradeType.BounceTargets]: bounceTargetsUpgrades,
     [WorkshopUpgradeType.Health]: healthUpgrades,
     [WorkshopUpgradeType.HealthRegen]: healthRegenUpgrades,
-    [WorkshopUpgradeType.DefensePercent]: defencePercentUpgrades,
-    [WorkshopUpgradeType.DefenseFlat]: defenceFlatUpgrades,
+    [WorkshopUpgradeType.DefensePercent]: defensePercentUpgrades,
+    [WorkshopUpgradeType.DefenseFlat]: defenseFlatUpgrades,
 }
 
 
@@ -112,4 +112,36 @@ export function getWorkshopUpgradeValueForLevel(upgrade: Upgrade[], level: numbe
     }
 
     return entry ? entry.value : 0
+}
+
+
+export function getWorkshopUpgradeInitialValue(upgrade: Upgrade[]): number {
+    const entry = upgrade[0]
+    return entry ? entry.value : 0
+}
+
+
+export function getWorkshopUpgradeCostForLevel(upgradeList: Upgrade[], level: number, startLevel: number): number {
+    let entry
+
+    const offsetLevel = level - startLevel
+    if (offsetLevel < 0) return 0
+
+    try {
+        // Entry should be at index level - 1
+        entry = upgradeList[offsetLevel - 1]
+    } catch {
+        entry = undefined
+    }
+
+    if (!entry || entry.level !== offsetLevel) {
+        entry = upgradeList.find(r => r.level === offsetLevel)
+    }
+
+    return entry ? entry.cost : 0
+}
+
+export function getWorkshopUpgradeInitialCost(upgradeList: Upgrade[]): number {
+    const entry = upgradeList[0]
+    return entry ? entry.cost : 0
 }

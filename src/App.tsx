@@ -6,7 +6,7 @@ import DefenseUpgrades from './components/defense/DefenseUpgrades'
 import LabAndStartSetup from './components/lab_and_start_setup/LabAndStartSetup'
 
 function App() {
-  const [currentTab, setCurrentTab] = useState(2)
+  const [currentTab, setCurrentTab] = useState(0)
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue)
@@ -22,7 +22,7 @@ function App() {
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={currentTab} onChange={handleChange} aria-label="basic tabs example" centered>
             <Tab label="Attack Upgrades" />
-            <Tab label="Defense Upgrades" />
+            {/* <Tab label="Defense Upgrades" /> */}
             {/* <Tab label="Utility Upgrades" /> */}
             <Tab label="Lab and start setup" />
           </Tabs>
@@ -30,9 +30,9 @@ function App() {
       </Box>
 
       {currentTab === 0 && <AttackUpgrades />}
-      {currentTab === 1 && <DefenseUpgrades />}
+      {/* {currentTab === 1 && <DefenseUpgrades />} */}
       {/* {currentTab === 2 && <UtilityUpgrades />} */}
-      {currentTab === 2 && <LabAndStartSetup />}
+      {currentTab === 1 && <LabAndStartSetup />}
 
       <Box sx={{ position: 'absolute', bottom: 12, width: '100%', textAlign: 'center' }}>
         <Typography variant="body2" color="textSecondary">

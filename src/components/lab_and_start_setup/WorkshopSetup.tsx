@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { allWorkshopUpgrades, getWorkshopUpgradeValueForLevel } from "../../data/battleUpgrades"
+import { allWorkshopUpgrades, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel } from "../../data/battleUpgrades"
 import type { Upgrade } from "../../data/type"
 import type { Stat } from "./type"
 import { Stack, TextField } from "@mui/material"
@@ -29,13 +29,13 @@ export default function WorkshopSetup({ stat, upgrade, onChange }: WorkshopSetup
         setLevel(newLevel)
         const newValue = getWorkshopUpgradeValueForLevel(allWorkshopUpgrades[stat.id], newLevel)
         setValue(newValue)
-        onChange({ id: stat.id, level: newLevel, value: newValue, cost: -1 })
+        onChange({ id: stat.id, level: newLevel, value: newValue, cost: getWorkshopUpgradeCostForLevel(allWorkshopUpgrades[stat.id], newLevel, upgrade.level) })
     }
 
     const onValueChange = (newValue: number) => {
         if (newValue < 0) return
         setValue(newValue)
-        onChange({ id: stat.id, level, value: newValue, cost: -1 })
+        onChange({ id: stat.id, level, value: newValue, cost: getWorkshopUpgradeCostForLevel(allWorkshopUpgrades[stat.id], level, upgrade.level) })
     }
 
     return (
