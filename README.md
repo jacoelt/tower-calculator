@@ -15,6 +15,13 @@ There, you can see, in order, which Upgrade will give you the most damage input 
 
 Hovering the upgrade will display the current state of the upgrade you should have at this point in the attack tab in the game.
 
+The best upgrade calculation assumes the following:
+* The calculation is made for the DPS of an optimal number of valid targets
+* The Bounce Shot Range is high enough to have all bounces
+* The Multishot will fire the maximum number of shots
+* The Rapid Fire can only trigger from normal bullets (Not in Rapid Fire, not a Multishot, not a Bounce)
+* The damage per distance is ignored per choice, considering that the moment you need the most dps is when ennemies are touching you, a situation where this bonus is useless
+
 ## Known issues
 
 ### Damage calculation

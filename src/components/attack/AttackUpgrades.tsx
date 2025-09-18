@@ -102,7 +102,7 @@ function calculateDps({
     const multishotMultiplier = 1 - (labMultishotChance / 100) + (labMultishotChance / 100) * labMultishotTargets
     const bounceMultiplier = 1 - (labBounceChance / 100) + (labBounceChance / 100) * labBounceTargets
 
-    // Rapid fire increases attack speed by 400% for 1 second
+    // Rapid fire increases dps by 400% for 1 second (fixed duration)
     // Average increase over time = (400% * 1s) / (1s + average time between rapid fire procs)
     // Average time between procs = 1 / attackSpeed * (100 / rapidFireChance)
 
@@ -306,7 +306,9 @@ export default function AttackUpgrades() {
                     ))}
                 </InfiniteScroll>
 
-                : <Typography variant="body1" gutterBottom>No upgrades available, please set your lab and workshop start levels in the Lab and Start Setup tab.</Typography>
+                : <Typography variant="body1" gutterBottom>
+                    No upgrades available, please set your lab and workshop start levels in the Lab and Start Setup tab.
+                </Typography>
             }
         </Stack >
     )

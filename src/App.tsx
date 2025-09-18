@@ -37,6 +37,9 @@ function App() {
         <Typography variant="body2" color="textSecondary">
           Data pulled from <a href="https://tower-workshop-calculator.netlify.app" target='_blank'>https://tower-workshop-calculator.netlify.app</a>
         </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Source code available on <a href="https://github.com/jacoelt/tower-calculator" target='_blank'>GitHub</a>
+        </Typography>
       </Box>
     </Box>
   )
