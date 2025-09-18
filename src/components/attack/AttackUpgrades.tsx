@@ -10,6 +10,7 @@ import { useState } from "react"
 
 const RAPID_FIRE_BONUS = 4 // 400% attack speed bonus
 const RAPID_FIRE_DURATION = 1 // 1 second duration
+const N_OF_STATES_TO_LOAD = 20 // Number of states to load each time
 
 
 export type UpgradeState = {
@@ -184,14 +185,14 @@ export default function AttackUpgrades() {
         bounceTargets: parsedValues[WorkshopUpgradeType.BounceTargets] || { id: WorkshopUpgradeType.BounceTargets, level: 0, value: 0, cost: getWorkshopUpgradeInitialCost(bounceTargetsUpgrades) },
     }
 
-    const updateStateListWith10NextStates = () => {
+    const updateStateListWithNextStates = () => {
         const resultList = [...stateList]
 
         if (resultList.length === 0)
             resultList.push(initialState)
 
         let currentState = resultList[resultList.length - 1]
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < N_OF_STATES_TO_LOAD; i++) {
             const nextState = calculateNextBestState(currentState)
             if (nextState.index === currentState.index) break // No more upgrades available
             resultList.push(nextState)
@@ -201,7 +202,7 @@ export default function AttackUpgrades() {
     }
 
     if (stateList.length === 0) {
-        updateStateListWith10NextStates()
+        updateStateListWithNextStates()
     }
 
     const backgroundColors: Record<string, string> = {
@@ -217,14 +218,14 @@ export default function AttackUpgrades() {
     }
 
     return (
-        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="90vh" width="100%">
+        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="90vh" width="95vw" id="scrollableDiv">
             {stateList.length > 0 ?
                 <InfiniteScroll
                     dataLength={stateList.length}
-                    next={updateStateListWith10NextStates}
+                    next={updateStateListWithNextStates}
                     hasMore={true}
                     loader={<Typography variant="body2" gutterBottom>Loading more upgrades...</Typography>}
-                    height={600}
+                    scrollableTarget="scrollableDiv"
                     style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
                 >
                     {stateList.map((state, idx) => (
@@ -233,9 +234,22 @@ export default function AttackUpgrades() {
                             key={idx}
                             placement="right"
                         >
-                            <Stack direction="row" key={idx} sx={{ padding: 2, border: '1px solid lightgray', borderRadius: 2, backgroundColor: backgroundColors[state.changedStat || ''] }} alignItems="center" spacing={4}>
+                            <Stack
+                                direction="row"
+                                key={idx}
+                                width={200}
+                                alignItems="center"
+                                justifyContent="center"
+                                sx={{
+                                    padding: 1,
+                                    border: '1px solid lightgray',
+                                    borderRadius: 2,
+                                    backgroundColor: backgroundColors[state.changedStat || '']
+                                }}
+                                spacing={4}
+                            >
                                 {state.changedStat ? (
-                                    <Stack direction="column" alignItems="center" width={200}>
+                                    <Stack direction="column" alignItems="center">
                                         <Typography variant="body1" gutterBottom>
                                             {WorkshopStats.find(stat => stat.id === state.changedStat)?.label}
                                         </Typography>

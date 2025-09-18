@@ -13,7 +13,7 @@ function App() {
   }
 
   return (
-    <Box sx={{ height: '100vh' }} display="flex" flexDirection="column" alignItems="center" position="relative">
+    <Box sx={{ height: '95vh' }} display="flex" flexDirection="column" alignItems="center" position="relative">
       <Typography variant="h4" gutterBottom>
         The Tower Mobile Idle Game: Upgrades calculator
       </Typography>
