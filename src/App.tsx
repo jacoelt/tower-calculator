@@ -33,7 +33,7 @@ function App() {
       {/* {currentTab === 2 && <UtilityUpgrades />} */}
       {currentTab === 1 && <LabAndStartSetup />}
 
-      <Box sx={{ position: 'absolute', bottom: 0, width: '100%', textAlign: 'center' }}>
+      <Box sx={{ position: 'fixed', bottom: 0, width: '100%', textAlign: 'center' }}>
         <Typography variant="body2" color="textSecondary">
           Data pulled from <a href="https://tower-workshop-calculator.netlify.app" target='_blank'>https://tower-workshop-calculator.netlify.app</a>
         </Typography>
