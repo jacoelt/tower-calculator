@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import type { Stat } from "./type"
 import { Stack, TextField } from "@mui/material"
 import { allLabResearches, getLabResearchValueForLevel } from "../../data/labResearches"
 import type { LabResearch } from "../../data/type"
+import type { LabStat } from "./type"
 
 
 type LabSetupProps = {
-    stat: Stat
+    stat: LabStat
     research: LabResearch
     onChange: (stat: LabResearch) => void
 }

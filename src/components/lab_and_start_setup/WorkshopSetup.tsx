@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import { allWorkshopUpgrades, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel } from "../../data/battleUpgrades"
 import type { Upgrade } from "../../data/type"
-import type { Stat } from "./type"
 import { Stack, TextField } from "@mui/material"
+import type { UpgradeStat } from "./type"
 
 
 type WorkshopSetupProps = {
-    stat: Stat
+    stat: UpgradeStat
     upgrade: Upgrade
     onChange: (stat: Upgrade) => void
 }
