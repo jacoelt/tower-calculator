@@ -1,69 +1,34 @@
-# React + TypeScript + Vite
+# The Tower Idle Game: Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This tool offers a calculator for damage optimisation for the upgrades of the game "The Tower Idle Game".
 
-Currently, two official plugins are available:
+## Usage
+### Setup lab and workshop
+Go to the Lab And Start Setup tab, and configure the level of your lab researches and current workshop upgrades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+These values are saved locally on the website's LocalStorage, no data is ever sent to any server.
 
-## Expanding the ESLint configuration
+### Attack Upgrades
+When this is done, jump into the Attack Upgrades tab.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+There, you can see, in order, which Upgrade will give you the most damage input per $ spent.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Hovering the upgrade will display the current state of the upgrade you should have at this point in the attack tab in the game.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Known issues
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Damage calculation
+Since I couldn't find an up-to-date list of values for the damage levels as of Sep 2025, damage calculation is approximative.
+
+It uses this formula, that more or less matches the damage values for the first 400 levels at least, which is enough for the moment:
+
+```
+4.73 + 4.2 * level + 0.115 * level * level
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Workshop damage update
+In the setup screen, the workshop value uses the lab boost for the displayed value, to match what you can see in game.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+However, the value is not updated when the lab level changes, you need to update it manually by changing the corresponding level of the workshop upgrade.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+This most likely won't be fixed because: the value is purely informative, and not used for calculation in the tool ; it only matters for 3 values in the attack upgrades ; it can easily be updated manually.
