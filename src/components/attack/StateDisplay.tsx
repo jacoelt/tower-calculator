@@ -4,9 +4,6 @@ import { WorkshopStats } from "../../data/stats";
 import type { Upgrade } from "../../data/type";
 
 export default function StateDisplay({ state }: { state: UpgradeState }) {
-    if (!state.changedStat) {
-        return null
-    }
 
     const statList = Object.keys(state).filter(key => key !== 'index' && key !== 'changedStat' && key !== 'statCost') as (keyof Omit<UpgradeState, 'index' | 'changedStat' | 'statCost'>)[]
 

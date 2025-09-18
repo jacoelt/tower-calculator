@@ -12,9 +12,7 @@ export default function usePersistantState<T>(
 
        if (!value) return;
 
-       console.log('parse')
        setInternalState(JSON.parse(value));
-       console.log('parsed')
    }, [key]);
 
    const setState = debounce((value: T) => {

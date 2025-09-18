@@ -1,10 +1,12 @@
-import { Stack, Typography } from "@mui/material"
+import { Stack, Tooltip, Typography } from "@mui/material"
 import { attackSpeedUpgrades, bounceChanceUpgrades, bounceTargetsUpgrades, criticalChanceUpgrades, criticalFactorUpgrades, damageUpgrades, getWorkshopUpgradeInitialCost, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel, multishotChanceUpgrades, multishotTargetsUpgrades, rapidFireChanceUpgrades, WorkshopUpgradeType } from "../../data/battleUpgrades"
 import { LabResearchType } from "../../data/labResearches"
 import { LAB_AND_START_SETUP_STORAGE_KEY } from "../lab_and_start_setup/constants"
 import type { Upgrade } from "../../data/type"
 import { WorkshopStats } from "../../data/stats"
 import StateDisplay from "./StateDisplay"
+import InfiniteScroll from "react-infinite-scroll-component"
+import { useState } from "react"
 
 const RAPID_FIRE_BONUS = 4 // 400% attack speed bonus
 const RAPID_FIRE_DURATION = 1 // 1 second duration
@@ -159,7 +161,7 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
 
 
 export default function AttackUpgrades() {
-    const stateList: UpgradeState[] = []
+    const [stateList, setStateList] = useState<UpgradeState[]>([])
 
     // Clear cache on component mount
     inMemoryCacheLabResearch = {}
@@ -182,11 +184,24 @@ export default function AttackUpgrades() {
         bounceTargets: parsedValues[WorkshopUpgradeType.BounceTargets] || { id: WorkshopUpgradeType.BounceTargets, level: 0, value: 0, cost: getWorkshopUpgradeInitialCost(bounceTargetsUpgrades) },
     }
 
-    while (true) {
-        const currentState = stateList.length === 0 ? initialState : stateList[stateList.length - 1]
-        const nextState = calculateNextBestState(currentState)
-        if (nextState.index === currentState.index) break // No more upgrades available
-        stateList.push(nextState)
+    const updateStateListWith10NextStates = () => {
+        const resultList = [...stateList]
+
+        if (resultList.length === 0)
+            resultList.push(initialState)
+
+        let currentState = resultList[resultList.length - 1]
+        for (let i = 0; i < 10; i++) {
+            const nextState = calculateNextBestState(currentState)
+            if (nextState.index === currentState.index) break // No more upgrades available
+            resultList.push(nextState)
+            currentState = nextState
+        }
+        setStateList(resultList)
+    }
+
+    if (stateList.length === 0) {
+        updateStateListWith10NextStates()
     }
 
     const backgroundColors: Record<string, string> = {
@@ -202,16 +217,42 @@ export default function AttackUpgrades() {
     }
 
     return (
-        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="90vh">
+        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="90vh" width="100%">
             {stateList.length > 0 ?
-                stateList.map((state, idx) => (
-                    <Stack direction="row" key={idx} sx={{ padding: 2, width: 'fit-content', border: '1px solid lightgray', borderRadius: 2, backgroundColor: backgroundColors[state.changedStat] }} alignItems="center" spacing={4}>
-                        <Typography variant="body1" gutterBottom>
-                            {state.changedStat ? `${WorkshopStats.find(stat => stat.id === state.changedStat)?.label} -> ${(state[state.changedStat] as Upgrade).value} for $${state.statCost}` : `No upgrades available`}
-                        </Typography>
-                        <StateDisplay state={state} />
-                    </Stack>
-                ))
+                <InfiniteScroll
+                    dataLength={stateList.length}
+                    next={updateStateListWith10NextStates}
+                    hasMore={true}
+                    loader={<Typography variant="body2" gutterBottom>Loading more upgrades...</Typography>}
+                    height={600}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
+                >
+                    {stateList.map((state, idx) => (
+                        <Tooltip
+                            title={<StateDisplay state={state} />}
+                            key={idx}
+                            placement="right"
+                        >
+                            <Stack direction="row" key={idx} sx={{ padding: 2, border: '1px solid lightgray', borderRadius: 2, backgroundColor: backgroundColors[state.changedStat || ''] }} alignItems="center" spacing={4}>
+                                {state.changedStat ? (
+                                    <Stack direction="column" alignItems="center" width={200}>
+                                        <Typography variant="body1" gutterBottom>
+                                            {WorkshopStats.find(stat => stat.id === state.changedStat)?.label}
+                                        </Typography>
+                                        <Typography variant="body1" gutterBottom>
+                                            {(state[state.changedStat] as Upgrade).value} for ${state.statCost}
+                                        </Typography>
+                                    </Stack>
+                                ) : (
+                                    <Typography variant="body1" gutterBottom>
+                                        Initial State
+                                    </Typography>
+                                )}
+                            </Stack>
+                        </Tooltip>
+                    ))}
+                </InfiniteScroll>
+
                 : <Typography variant="body1" gutterBottom>No upgrades available, please set your lab and workshop start levels in the Lab and Start Setup tab.</Typography>
             }
         </Stack >
