@@ -13,7 +13,7 @@ function App() {
   }
 
   return (
-    <Box sx={{ height: '100vh', width: '100vw' }}>
+    <Box sx={{ height: '100vh' }} display="flex" flexDirection="column" alignItems="center" position="relative">
       <Typography variant="h4" gutterBottom>
         The Tower Mobile Idle Game: Upgrades calculator
       </Typography>
@@ -34,7 +34,7 @@ function App() {
       {/* {currentTab === 2 && <UtilityUpgrades />} */}
       {currentTab === 1 && <LabAndStartSetup />}
 
-      <Box sx={{ position: 'absolute', bottom: 12, width: '100%', textAlign: 'center' }}>
+      <Box sx={{ position: 'absolute', bottom: 0, width: '100%', textAlign: 'center' }}>
         <Typography variant="body2" color="textSecondary">
           Data pulled from <a href="https://tower-workshop-calculator.netlify.app" target='_blank'>https://tower-workshop-calculator.netlify.app</a>
         </Typography>

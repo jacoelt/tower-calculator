@@ -1,3 +1,4 @@
+import { LAB_AND_START_SETUP_STORAGE_KEY } from "../components/lab_and_start_setup/constants";
 import { labAttackSpeedStr, labCritFactorStr, labDamageStr, labDefenseFlatStr, labDefensePercentStr } from "./dataStrings";
 import type { LabResearch } from "./type";
 import { kToNumber } from "./utils";
@@ -25,7 +26,7 @@ function formatDataString(dataString: string, id: LabResearchType): LabResearch[
         const [level, value] = line.split('\t').map(item => item.trim())
         return {
             id,
-            level: kToNumber(level),
+            level: kToNumber(level) + 1,
             value: kToNumber(value)
         }
     })
@@ -48,8 +49,11 @@ export const allLabResearches: { [key: string]: LabResearch[] } = {
 }
 
 
-export function getLabResearchValueForLevel(research: LabResearch[], level: number): number {
+export function getLabResearchValueForLevel(researchType: LabResearchType, level: number): number {
     let entry
+
+    const research = allLabResearches[researchType]
+    if (!research) return 0
 
     try {
         // Entry should be at index level - 1
@@ -63,4 +67,25 @@ export function getLabResearchValueForLevel(research: LabResearch[], level: numb
     }
 
     return entry ? entry.value : 0
+}
+
+export function getCurrentLabResearchValue(researchType: LabResearchType): number {
+    const defaultValue = researchType === LabResearchType.DefensePercent ? 0 : 1
+    const research = allLabResearches[researchType]
+    if (!research) return defaultValue
+
+    const currentData = localStorage.getItem(LAB_AND_START_SETUP_STORAGE_KEY)
+    if (!currentData) return defaultValue
+
+    const parsedData = JSON.parse(currentData)
+    if (!parsedData || !parsedData.lab || !parsedData.lab[researchType]) return defaultValue
+
+    const level = parsedData.lab[researchType].level
+    if (level <= 0) return defaultValue
+
+    return getLabResearchValueForLevel(researchType, level)
+}
+
+export function isLabResearchType(value: string): value is LabResearchType {
+    return Object.values(LabResearchType).includes(value as LabResearchType)
 }

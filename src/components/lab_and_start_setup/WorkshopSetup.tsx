@@ -16,7 +16,6 @@ export default function WorkshopSetup({ stat, upgrade, onChange }: WorkshopSetup
     const [level, setLevel] = useState(upgrade.level)
     const [value, setValue] = useState(upgrade.value)
 
-
     useEffect(() => {
         setLevel(upgrade.level)
         setValue(upgrade.value)
@@ -27,7 +26,7 @@ export default function WorkshopSetup({ stat, upgrade, onChange }: WorkshopSetup
         if (newLevel < 0) return
         if (newLevel > allWorkshopUpgrades[stat.id].length - 1) return
         setLevel(newLevel)
-        const newValue = getWorkshopUpgradeValueForLevel(allWorkshopUpgrades[stat.id], newLevel)
+        const newValue = getWorkshopUpgradeValueForLevel(stat.id, newLevel)
         setValue(newValue)
         onChange({ id: stat.id, level: newLevel, value: newValue, cost: getWorkshopUpgradeCostForLevel(allWorkshopUpgrades[stat.id], newLevel, upgrade.level) })
     }

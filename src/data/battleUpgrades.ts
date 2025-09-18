@@ -14,6 +14,7 @@ import {
     multishotTargetsStr,
     rapidFireChanceStr,
 } from "./dataStrings";
+import { getCurrentLabResearchValue as getLabCurrentResearchValue, isLabResearchType } from "./labResearches";
 
 import type { Upgrade } from "./type";
 import { kToNumber } from "./utils";
@@ -97,8 +98,11 @@ export const allWorkshopUpgrades: { [key: string]: Upgrade[] } = {
 }
 
 
-export function getWorkshopUpgradeValueForLevel(upgrade: Upgrade[], level: number): number {
+export function getWorkshopUpgradeValueForLevel(upgradeType: WorkshopUpgradeType, level: number): number {
     let entry
+
+    const upgrade = allWorkshopUpgrades[upgradeType]
+    if (!upgrade) return 0
 
     try {
         // Entry should be at index level - 1
@@ -111,7 +115,22 @@ export function getWorkshopUpgradeValueForLevel(upgrade: Upgrade[], level: numbe
         entry = upgrade.find(r => r.level === level)
     }
 
-    return entry ? entry.value : 0
+    if (!entry) {
+        return 0
+    }
+
+    let value: number = entry.value
+    if (isLabResearchType(upgradeType)) {
+        // Has a lab boost
+        const labBoost = getLabCurrentResearchValue(upgradeType)
+        if (upgradeType === WorkshopUpgradeType.DefensePercent) {
+            // Defense percent is additive
+            value += labBoost
+        }
+        value *= labBoost
+    }
+
+    return Math.round(value * 100) / 100
 }
 
 
@@ -138,10 +157,10 @@ export function getWorkshopUpgradeCostForLevel(upgradeList: Upgrade[], level: nu
         entry = upgradeList.find(r => r.level === offsetLevel)
     }
 
-    return entry ? entry.cost : 0
+    return entry ? Math.round(entry.cost) : 0
 }
 
 export function getWorkshopUpgradeInitialCost(upgradeList: Upgrade[]): number {
     const entry = upgradeList[0]
-    return entry ? entry.cost : 0
+    return entry ? Math.round(entry.cost) : 0
 }

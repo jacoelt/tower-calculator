@@ -25,7 +25,7 @@ export default function LabSetup({ stat, research, onChange }: LabSetupProps) {
         if (newLevel < 0) return
         if (newLevel > allLabResearches[stat.id].length - 1) return
         setLevel(newLevel)
-        const newValue = getLabResearchValueForLevel(allLabResearches[stat.id], newLevel)
+        const newValue = getLabResearchValueForLevel(stat.id, newLevel)
         setValue(newValue)
         onChange({ id: stat.id, level: newLevel, value: newValue })
     }

@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material"
 import { attackSpeedUpgrades, bounceChanceUpgrades, bounceTargetsUpgrades, criticalChanceUpgrades, criticalFactorUpgrades, damageUpgrades, getWorkshopUpgradeInitialCost, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel, multishotChanceUpgrades, multishotTargetsUpgrades, rapidFireChanceUpgrades, WorkshopUpgradeType } from "../../data/battleUpgrades"
 import { LabResearchType } from "../../data/labResearches"
-import { LAB_AND_START_SETUP_STORAGE_KEY } from "../lab_and_start_setup/LabAndStartSetup"
+import { LAB_AND_START_SETUP_STORAGE_KEY } from "../lab_and_start_setup/constants"
 import type { Upgrade } from "../../data/type"
 import { WorkshopStats } from "../../data/stats"
 import StateDisplay from "./StateDisplay"
@@ -73,11 +73,14 @@ function calculateDps({
     const labBounceChance = bounceChance.value  // No lab upgrade
     const labBounceTargets = bounceTargets.value  // No lab upgrade
 
-
     // Calculate multipliers
-    const critMultiplier = 1 + (labCritChance / 100) * (labCritFactor / 100 - 1)
-    const multishotMultiplier = 1 + (labMultishotChance / 100) * (labMultishotTargets - 1)
-    const bounceMultiplier = 1 + (labBounceChance / 100) * (labBounceTargets - 1)
+    // crit = 1-chc + chc*cf
+    // multishot = 1-msc + msc*mst
+    // bounce = 1-bc + bc*bt
+    // Note: multishot and bounce do not interact, so we can just multiply them together
+    const critMultiplier = 1 - (labCritChance / 100) + (labCritChance / 100) * labCritFactor
+    const multishotMultiplier = 1 - (labMultishotChance / 100) + (labMultishotChance / 100) * labMultishotTargets
+    const bounceMultiplier = 1 - (labBounceChance / 100) + (labBounceChance / 100) * labBounceTargets
 
     // Rapid fire increases attack speed by 400% for 1 second
     // Average increase over time = (400% * 1s) / (1s + average time between rapid fire procs)
@@ -96,15 +99,15 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
     const currentDps = calculateDps(currentState)
 
     const nextValues = {
-        damage: getWorkshopUpgradeValueForLevel(damageUpgrades, currentState.damage.level + 1),
-        attackSpeed: getWorkshopUpgradeValueForLevel(attackSpeedUpgrades, currentState.attackSpeed.level + 1),
-        critChance: getWorkshopUpgradeValueForLevel(criticalChanceUpgrades, currentState.critChance.level + 1),
-        critFactor: getWorkshopUpgradeValueForLevel(criticalFactorUpgrades, currentState.critFactor.level + 1),
-        multishotChance: getWorkshopUpgradeValueForLevel(multishotChanceUpgrades, currentState.multishotChance.level + 1),
-        multishotTargets: getWorkshopUpgradeValueForLevel(multishotTargetsUpgrades, currentState.multishotTargets.level + 1),
-        rapidFireChance: getWorkshopUpgradeValueForLevel(rapidFireChanceUpgrades, currentState.rapidFireChance.level + 1),
-        bounceChance: getWorkshopUpgradeValueForLevel(bounceChanceUpgrades, currentState.bounceChance.level + 1),
-        bounceTargets: getWorkshopUpgradeValueForLevel(bounceTargetsUpgrades, currentState.bounceTargets.level + 1),
+        damage: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.Damage, currentState.damage.level + 1),
+        attackSpeed: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.AttackSpeed, currentState.attackSpeed.level + 1),
+        critChance: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.CritChance, currentState.critChance.level + 1),
+        critFactor: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.CritFactor, currentState.critFactor.level + 1),
+        multishotChance: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.MultishotChance, currentState.multishotChance.level + 1),
+        multishotTargets: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.MultishotTargets, currentState.multishotTargets.level + 1),
+        rapidFireChance: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.RapidFireChance, currentState.rapidFireChance.level + 1),
+        bounceChance: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.BounceChance, currentState.bounceChance.level + 1),
+        bounceTargets: getWorkshopUpgradeValueForLevel(WorkshopUpgradeType.BounceTargets, currentState.bounceTargets.level + 1),
     }
 
     const nextDpsValues = {
@@ -199,7 +202,7 @@ export default function AttackUpgrades() {
     }
 
     return (
-        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="80vh">
+        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="90vh">
             {stateList.length > 0 ?
                 stateList.map((state, idx) => (
                     <Stack direction="row" key={idx} sx={{ padding: 2, width: 'fit-content', border: '1px solid lightgray', borderRadius: 2, backgroundColor: backgroundColors[state.changedStat] }} alignItems="center" spacing={4}>

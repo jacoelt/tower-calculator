@@ -6,9 +6,7 @@ import { attackSpeedUpgrades, bounceChanceUpgrades, bounceTargetsUpgrades, criti
 import type { LabResearch, Upgrade } from "../../data/type"
 import usePersistantState from "../../utils/usePersistantState"
 import { LabStats, WorkshopStats } from "../../data/stats"
-
-
-export const LAB_AND_START_SETUP_STORAGE_KEY = "lab_and_start_setup"
+import { LAB_AND_START_SETUP_STORAGE_KEY } from "./constants"
 
 
 export default function LabAndStartSetup() {

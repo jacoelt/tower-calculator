@@ -13,9 +13,9 @@ export const LabStats: LabStat[] = [
 
 export const WorkshopStats: UpgradeStat[] = [
     { id: WorkshopUpgradeType.Damage, label: "Damage" },
+    { id: WorkshopUpgradeType.CritFactor, label: "Crit Factor" },
     { id: WorkshopUpgradeType.AttackSpeed, label: "Attack Speed" },
     { id: WorkshopUpgradeType.CritChance, label: "Crit Chance" },
-    { id: WorkshopUpgradeType.CritFactor, label: "Crit Factor" },
     { id: WorkshopUpgradeType.MultishotChance, label: "Multishot Chance" },
     { id: WorkshopUpgradeType.MultishotTargets, label: "Multishot Targets" },
     { id: WorkshopUpgradeType.RapidFireChance, label: "Rapid Fire Chance" },
