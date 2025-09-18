@@ -14,7 +14,7 @@ import {
     multishotTargetsStr,
     rapidFireChanceStr,
 } from "./dataStrings";
-import { getCurrentLabResearchValue as getLabCurrentResearchValue, isLabResearchType } from "./labResearches";
+import { getCurrentLabResearchValue as getLabCurrentResearchValue, isLabResearchType, LabResearchType } from "./labResearches";
 
 import type { Upgrade } from "./type";
 import { kToNumber } from "./utils";
@@ -99,6 +99,14 @@ export const allWorkshopUpgrades: { [key: string]: Upgrade[] } = {
 
 
 export function getWorkshopUpgradeValueForLevel(upgradeType: WorkshopUpgradeType, level: number): number {
+    // Use specific formula for damage cause fetched values are no longer correct
+    // Formula estimated from real values with upgrades
+    // Damage formula: 4,73 + 4,2*Level + 0,115*Level*Level
+    if (upgradeType === WorkshopUpgradeType.Damage) {
+        const labBoost = getLabCurrentResearchValue(LabResearchType.Damage)
+        return Math.round((4.73 + 4.2 * level + 0.115 * level * level) * labBoost * 100) / 100
+    }
+
     let entry
 
     const upgrade = allWorkshopUpgrades[upgradeType]
