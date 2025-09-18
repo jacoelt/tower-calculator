@@ -293,7 +293,7 @@ export default function AttackUpgrades() {
                                             {WorkshopStats.find(stat => stat.id === state.changedStat)?.label}
                                         </Typography>
                                         <Typography variant="body1" gutterBottom>
-                                            {numberToK(state.oldStatValue)} -&gt; {numberToK((state[state.changedStat] as Upgrade).value)} for ${numberToK(state.statCost)}
+                                            {numberToK(state.oldStatValue)} -&gt; <strong>{numberToK((state[state.changedStat] as Upgrade).value)}</strong> for ${numberToK(state.statCost)}
                                         </Typography>
                                     </Stack>
                                 ) : (
