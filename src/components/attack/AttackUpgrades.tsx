@@ -7,6 +7,7 @@ import { WorkshopStats } from "../../data/stats"
 import StateDisplay from "./StateDisplay"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { useState } from "react"
+import { numberToK } from "../../data/utils"
 
 const RAPID_FIRE_BONUS = 4 // 400% attack speed bonus
 const RAPID_FIRE_DURATION = 1 // 1 second duration
@@ -32,6 +33,7 @@ export type UpgradeState = {
     index: number,
     changedStat?: keyof Omit<UpgradeState, 'index' | 'changedStat'>,
     statCost?: number,
+    oldStatValue?: number,
     damage: Upgrade,
     attackSpeed: Upgrade,
     critChance: Upgrade,
@@ -170,7 +172,14 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
 
     if (!bestStat) return currentState // No upgrades available
 
-    const nextBestState: UpgradeState = { ...currentState, index: currentState.index + 1, changedStat: bestStat, statCost: bestCost }
+    const currentStatValue = currentState[bestStat].value
+    const nextBestState: UpgradeState = {
+        ...currentState,
+        index: currentState.index + 1,
+        changedStat: bestStat,
+        statCost: bestCost,
+        oldStatValue: currentStatValue,
+    }
     nextBestState[bestStat] = {
         ...nextBestState[bestStat],
         level: nextBestState[bestStat].level + 1,
@@ -284,7 +293,7 @@ export default function AttackUpgrades() {
                                             {WorkshopStats.find(stat => stat.id === state.changedStat)?.label}
                                         </Typography>
                                         <Typography variant="body1" gutterBottom>
-                                            {(state[state.changedStat] as Upgrade).value} for ${state.statCost}
+                                            {numberToK(state.oldStatValue)} -&gt; {numberToK((state[state.changedStat] as Upgrade).value)} for ${numberToK(state.statCost)}
                                         </Typography>
                                     </Stack>
                                 ) : (

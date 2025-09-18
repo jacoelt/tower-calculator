@@ -577,7 +577,8 @@ export const criticalChanceStr = `0	1.00	4.00
 75	76.00	4.02K
 76	77.00	4.14K
 77	78.00	4.26K
-78	79.00	4.38K`
+78	79.00	4.38K
+79	80.00	4.50K`
 
 export const criticalFactorStr = `0	1.20	10.00
 1	1.30	12.00

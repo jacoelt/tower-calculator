@@ -2,10 +2,11 @@ import { Stack, Typography } from "@mui/material";
 import type { UpgradeState } from "./AttackUpgrades";
 import { WorkshopStats } from "../../data/stats";
 import type { Upgrade } from "../../data/type";
+import { numberToK } from "../../data/utils";
 
 export default function StateDisplay({ state }: { state: UpgradeState }) {
 
-    const statList = Object.keys(state).filter(key => key !== 'index' && key !== 'changedStat' && key !== 'statCost') as (keyof Omit<UpgradeState, 'index' | 'changedStat' | 'statCost'>)[]
+    const statList = Object.keys(state).filter(key => key !== 'index' && key !== 'changedStat' && key !== 'statCost' && key !== 'oldStatValue') as (keyof Omit<UpgradeState, 'index' | 'changedStat' | 'statCost' | 'oldStatValue'>)[]
 
     return (
         <Stack direction="row" spacing={2} marginTop={2} width={390} justifyContent="center" flexWrap="wrap">
@@ -23,10 +24,10 @@ export default function StateDisplay({ state }: { state: UpgradeState }) {
                         {WorkshopStats.find(s => s.id === stat)?.label}
                     </Typography>
                     <Typography variant="body2">
-                        {(state[stat] as Upgrade).value}
+                        {numberToK((state[stat] as Upgrade).value)}
                     </Typography>
                     <Typography variant="body2">
-                        ${state[stat].cost}
+                        ${numberToK(state[stat].cost)}
                     </Typography>
                 </Stack>
             ))}
