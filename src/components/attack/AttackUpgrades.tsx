@@ -1,5 +1,5 @@
 import { Stack, Tooltip, Typography } from "@mui/material"
-import { attackSpeedUpgrades, bounceChanceUpgrades, bounceTargetsUpgrades, criticalChanceUpgrades, criticalFactorUpgrades, damageUpgrades, getWorkshopUpgradeInitialCost, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel, multishotChanceUpgrades, multishotTargetsUpgrades, rapidFireChanceUpgrades, WorkshopUpgradeType } from "../../data/battleUpgrades"
+import { attackSpeedUpgrades, bounceChanceUpgrades, bounceTargetsUpgrades, criticalChanceUpgrades, criticalFactorUpgrades, damageUpgrades, getWorkshopUpgradeInitialCost, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel, multishotChanceUpgrades, multishotTargetsUpgrades, rapidFireChanceUpgrades, WorkshopUpgradeType, allWorkshopUpgrades } from "../../data/battleUpgrades"
 import { LabResearchType } from "../../data/labResearches"
 import { LAB_AND_START_SETUP_STORAGE_KEY } from "../lab_and_start_setup/constants"
 import type { Upgrade } from "../../data/type"
@@ -125,16 +125,16 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
         bounceTargets: calculateDps({ ...currentState, bounceTargets: { ...currentState.bounceTargets, value: nextValues.bounceTargets } }),
     }
 
-    const nextCostValues = {
-        damage: getWorkshopUpgradeCostForLevel(damageUpgrades, currentState.damage.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.Damage)),
-        attackSpeed: getWorkshopUpgradeCostForLevel(attackSpeedUpgrades, currentState.attackSpeed.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.AttackSpeed)),
-        critChance: getWorkshopUpgradeCostForLevel(criticalChanceUpgrades, currentState.critChance.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.CritChance)),
-        critFactor: getWorkshopUpgradeCostForLevel(criticalFactorUpgrades, currentState.critFactor.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.CritFactor)),
-        multishotChance: getWorkshopUpgradeCostForLevel(multishotChanceUpgrades, currentState.multishotChance.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.MultishotChance)),
-        multishotTargets: getWorkshopUpgradeCostForLevel(multishotTargetsUpgrades, currentState.multishotTargets.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.MultishotTargets)),
-        rapidFireChance: getWorkshopUpgradeCostForLevel(rapidFireChanceUpgrades, currentState.rapidFireChance.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.RapidFireChance)),
-        bounceChance: getWorkshopUpgradeCostForLevel(bounceChanceUpgrades, currentState.bounceChance.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.BounceChance)),
-        bounceTargets: getWorkshopUpgradeCostForLevel(bounceTargetsUpgrades, currentState.bounceTargets.level + 1, getWorkshopStartLevelForStat(WorkshopUpgradeType.BounceTargets)),
+    const currentCostValues = {
+        damage: getWorkshopUpgradeCostForLevel(damageUpgrades, currentState.damage.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.Damage)),
+        attackSpeed: getWorkshopUpgradeCostForLevel(attackSpeedUpgrades, currentState.attackSpeed.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.AttackSpeed)),
+        critChance: getWorkshopUpgradeCostForLevel(criticalChanceUpgrades, currentState.critChance.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.CritChance)),
+        critFactor: getWorkshopUpgradeCostForLevel(criticalFactorUpgrades, currentState.critFactor.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.CritFactor)),
+        multishotChance: getWorkshopUpgradeCostForLevel(multishotChanceUpgrades, currentState.multishotChance.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.MultishotChance)),
+        multishotTargets: getWorkshopUpgradeCostForLevel(multishotTargetsUpgrades, currentState.multishotTargets.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.MultishotTargets)),
+        rapidFireChance: getWorkshopUpgradeCostForLevel(rapidFireChanceUpgrades, currentState.rapidFireChance.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.RapidFireChance)),
+        bounceChance: getWorkshopUpgradeCostForLevel(bounceChanceUpgrades, currentState.bounceChance.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.BounceChance)),
+        bounceTargets: getWorkshopUpgradeCostForLevel(bounceTargetsUpgrades, currentState.bounceTargets.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.BounceTargets)),
     }
 
     let bestEfficiency = 0
@@ -143,7 +143,7 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
 
     for (const [stat, dps] of Object.entries(nextDpsValues)) {
         const increase = dps - currentDps
-        const cost = nextCostValues[stat as keyof typeof nextCostValues]
+        const cost = currentCostValues[stat as keyof typeof currentCostValues]
         if (cost <= 0) continue // No more upgrades available
         const efficiency = increase / cost
         if (efficiency > bestEfficiency) {
@@ -156,7 +156,12 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
     if (!bestStat) return currentState // No upgrades available
 
     const nextBestState: UpgradeState = { ...currentState, index: currentState.index + 1, changedStat: bestStat, statCost: bestCost }
-    nextBestState[bestStat] = { ...nextBestState[bestStat], level: nextBestState[bestStat].level + 1, value: nextValues[bestStat], cost: nextCostValues[bestStat] }
+    nextBestState[bestStat] = {
+        ...nextBestState[bestStat],
+        level: nextBestState[bestStat].level + 1,
+        value: nextValues[bestStat],
+        cost: getWorkshopUpgradeCostForLevel(allWorkshopUpgrades[bestStat], nextBestState[bestStat].level + 1, getWorkshopStartLevelForStat(bestStat as WorkshopUpgradeType))
+    }
     return nextBestState;
 }
 
