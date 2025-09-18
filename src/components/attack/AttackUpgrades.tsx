@@ -1,4 +1,4 @@
-import { Stack, Tooltip, Typography } from "@mui/material"
+import { Stack, styled, Tooltip, tooltipClasses, Typography, type TooltipProps } from "@mui/material"
 import { attackSpeedUpgrades, bounceChanceUpgrades, bounceTargetsUpgrades, criticalChanceUpgrades, criticalFactorUpgrades, damageUpgrades, getWorkshopUpgradeInitialCost, getWorkshopUpgradeCostForLevel, getWorkshopUpgradeValueForLevel, multishotChanceUpgrades, multishotTargetsUpgrades, rapidFireChanceUpgrades, WorkshopUpgradeType, allWorkshopUpgrades } from "../../data/battleUpgrades"
 import { LabResearchType } from "../../data/labResearches"
 import { LAB_AND_START_SETUP_STORAGE_KEY } from "../lab_and_start_setup/constants"
@@ -11,6 +11,21 @@ import { useState } from "react"
 const RAPID_FIRE_BONUS = 4 // 400% attack speed bonus
 const RAPID_FIRE_DURATION = 1 // 1 second duration
 const N_OF_STATES_TO_LOAD = 20 // Number of states to load each time
+
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: theme.palette.common.white,
+        color: 'rgba(0, 0, 0, 0.87)',
+        boxShadow: theme.shadows[1],
+        fontSize: 11,
+        maxWidth: 400,
+        paddingLeft: 0,
+        paddingRight: 0,
+    },
+}));
 
 
 export type UpgradeState = {
@@ -223,7 +238,17 @@ export default function AttackUpgrades() {
     }
 
     return (
-        <Stack direction="column" display="flex" alignItems="center" padding={2} gap={2} overflow="auto" maxHeight="90vh" width="95vw" id="scrollableDiv">
+        <Stack
+            direction="column"
+            display="flex"
+            alignItems="center"
+            padding={2}
+            gap={2}
+            overflow="auto"
+            maxHeight="calc(100vh - 250px)"
+            width="95vw"
+            id="scrollableDiv"
+        >
             {stateList.length > 0 ?
                 <InfiniteScroll
                     dataLength={stateList.length}
@@ -234,7 +259,7 @@ export default function AttackUpgrades() {
                     style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
                 >
                     {stateList.map((state, idx) => (
-                        <Tooltip
+                        <LightTooltip
                             title={<StateDisplay state={state} />}
                             key={idx}
                             placement="right"
@@ -268,7 +293,7 @@ export default function AttackUpgrades() {
                                     </Typography>
                                 )}
                             </Stack>
-                        </Tooltip>
+                        </LightTooltip>
                     ))}
                 </InfiniteScroll>
 

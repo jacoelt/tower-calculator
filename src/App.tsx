@@ -2,7 +2,6 @@ import { useState } from 'react'
 import './App.css'
 import { Box, Tab, Tabs, Typography } from '@mui/material'
 import AttackUpgrades from './components/attack/AttackUpgrades'
-import DefenseUpgrades from './components/defense/DefenseUpgrades'
 import LabAndStartSetup from './components/lab_and_start_setup/LabAndStartSetup'
 
 function App() {
