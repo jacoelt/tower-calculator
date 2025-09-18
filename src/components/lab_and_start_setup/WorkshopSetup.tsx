@@ -54,6 +54,7 @@ export default function WorkshopSetup({ stat, upgrade, onChange }: WorkshopSetup
                 onChange={(e) => onValueChange(parseFloat(e.target.value) || 0)}
                 variant="outlined"
                 margin="normal"
+                disabled={true}
             />
         </Stack>
     )

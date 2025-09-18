@@ -53,6 +53,7 @@ export default function LabSetup({ stat, research, onChange }: LabSetupProps) {
                 onChange={(e) => onValueChange(parseFloat(e.target.value) || 0)}
                 variant="outlined"
                 margin="normal"
+                disabled={true}
             />
         </Stack>
     )
