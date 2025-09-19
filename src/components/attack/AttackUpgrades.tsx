@@ -8,9 +8,10 @@ import StateDisplay from "./StateDisplay"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { useState } from "react"
 import { numberToK } from "../../data/utils"
+import Decimal from "decimal.js"
 
-const RAPID_FIRE_BONUS = 4 // 400% attack speed bonus
-const RAPID_FIRE_DURATION = 1 // 1 second duration
+const RAPID_FIRE_BONUS = Decimal(4) // 400% attack speed bonus
+const RAPID_FIRE_DURATION = Decimal(1) // 1 second duration
 const N_OF_STATES_TO_LOAD = 20 // Number of states to load each time
 
 
@@ -80,38 +81,38 @@ function calculateDps({
     rapidFireChance,
     bounceChance,
     bounceTargets
-}: UpgradeState): number {
+}: UpgradeState): Decimal {
 
     // Calculate lab updated values
-    const labDamage = damage.value * getLabMultiplierForStat(LabResearchType.Damage)
-    const labAttackSpeed = attackSpeed.value * getLabMultiplierForStat(LabResearchType.AttackSpeed)
-    const labCritChance = critChance.value  // No lab upgrade for crit chance
-    const labCritFactor = critFactor.value * getLabMultiplierForStat(LabResearchType.CritFactor)
-    const labMultishotChance = multishotChance.value  // No lab upgrade
-    const labMultishotTargets = multishotTargets.value  // No lab upgrade
-    const labRapidFireChance = rapidFireChance.value  // No lab upgrade
-    const labBounceChance = bounceChance.value  // No lab upgrade
-    const labBounceTargets = bounceTargets.value  // No lab upgrade
+    const labDamage = Decimal(damage.value).mul(getLabMultiplierForStat(LabResearchType.Damage))
+    const labAttackSpeed = Decimal(attackSpeed.value).mul(getLabMultiplierForStat(LabResearchType.AttackSpeed))
+    const labCritChance = Decimal(critChance.value)  // No lab upgrade for crit chance
+    const labCritFactor = Decimal(critFactor.value).mul(getLabMultiplierForStat(LabResearchType.CritFactor))
+    const labMultishotChance = Decimal(multishotChance.value)  // No lab upgrade
+    const labMultishotTargets = Decimal(multishotTargets.value)  // No lab upgrade
+    const labRapidFireChance = Decimal(rapidFireChance.value)  // No lab upgrade
+    const labBounceChance = Decimal(bounceChance.value)  // No lab upgrade
+    const labBounceTargets = Decimal(bounceTargets.value)  // No lab upgrade
 
     // Calculate multipliers
     // crit = 1-chc + chc*cf
     // multishot = 1-msc + msc*mst
     // bounce = 1-bc + bc*bt
     // Note: multishot and bounce do not interact, so we can just multiply them together
-    const critMultiplier = 1 - (labCritChance / 100) + (labCritChance / 100) * labCritFactor
-    const multishotMultiplier = 1 - (labMultishotChance / 100) + (labMultishotChance / 100) * labMultishotTargets
-    const bounceMultiplier = 1 - (labBounceChance / 100) + (labBounceChance / 100) * labBounceTargets
+    const critMultiplier = Decimal(1).sub(labCritChance.div(100)).add(labCritChance.div(100).mul(labCritFactor))
+    const multishotMultiplier = Decimal(1).sub(labMultishotChance.div(100)).add(labMultishotChance.div(100).mul(labMultishotTargets))
+    const bounceMultiplier = Decimal(1).sub(labBounceChance.div(100)).add(labBounceChance.div(100).mul(labBounceTargets))
 
     // Rapid fire increases dps by 400% for 1 second (fixed duration)
     // Average increase over time = (400% * 1s) / (1s + average time between rapid fire procs)
     // Average time between procs = 1 / attackSpeed * (100 / rapidFireChance)
 
-    const averageTimeBetweenProcs = 1 / labAttackSpeed * (100 / labRapidFireChance)
-    const averageIncreaseOverTime = (RAPID_FIRE_BONUS * RAPID_FIRE_DURATION) / (RAPID_FIRE_DURATION + averageTimeBetweenProcs)
-    const attackSpeedFinal = labAttackSpeed * (1 + averageIncreaseOverTime / 100)
+    const averageTimeBetweenProcs = Decimal(1).div(labAttackSpeed).mul(100).div(labRapidFireChance)
+    const averageIncreaseOverTime = (RAPID_FIRE_BONUS.mul(RAPID_FIRE_DURATION)).div(RAPID_FIRE_DURATION.add(averageTimeBetweenProcs))
+    const attackSpeedFinal = labAttackSpeed.mul(Decimal(1).add(averageIncreaseOverTime.div(100)))
 
 
-    return labDamage * attackSpeedFinal * critMultiplier * multishotMultiplier * bounceMultiplier
+    return labDamage.mul(attackSpeedFinal).mul(critMultiplier).mul(multishotMultiplier).mul(bounceMultiplier)
 }
 
 
@@ -154,16 +155,16 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
         bounceTargets: getWorkshopUpgradeCostForLevel(bounceTargetsUpgrades, currentState.bounceTargets.level, getWorkshopStartLevelForStat(WorkshopUpgradeType.BounceTargets)),
     }
 
-    let bestEfficiency = 0
+    let bestEfficiency = Decimal(0)
     let bestStat: keyof typeof nextDpsValues | null = null
-    let bestCost = 0
+    let bestCost = Decimal(0)
 
     for (const [stat, dps] of Object.entries(nextDpsValues)) {
-        const increase = dps - currentDps
-        const cost = currentCostValues[stat as keyof typeof currentCostValues]
-        if (cost <= 0) continue // No more upgrades available
-        const efficiency = increase / cost
-        if (efficiency > bestEfficiency) {
+        const increase = dps.sub(currentDps)
+        const cost = Decimal(currentCostValues[stat as keyof typeof currentCostValues])
+        if (cost.lte(0)) continue // No more upgrades available
+        const efficiency = increase.div(cost)
+        if (efficiency.gt(bestEfficiency)) {
             bestEfficiency = efficiency
             bestStat = stat as keyof typeof nextDpsValues
             bestCost = cost
@@ -177,7 +178,7 @@ function calculateNextBestState(currentState: UpgradeState): UpgradeState {
         ...currentState,
         index: currentState.index + 1,
         changedStat: bestStat,
-        statCost: bestCost,
+        statCost: bestCost.toNumber(),
         oldStatValue: currentStatValue,
     }
     nextBestState[bestStat] = {
