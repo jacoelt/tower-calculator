@@ -21,6 +21,7 @@ The best upgrade calculation assumes the following:
 * The Multishot will fire the maximum number of shots
 * The Rapid Fire can only trigger from normal bullets (Not in Rapid Fire, not a Multishot, not a Bounce)
 * The damage per distance is ignored per choice, considering that the moment you need the most dps is when ennemies are touching you, a situation where this bonus is useless
+* The Rapid Fire Duration is at 1 second
 
 ## Known issues
 
